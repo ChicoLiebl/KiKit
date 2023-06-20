@@ -160,6 +160,11 @@ def exportPcbway(board, outputdir, assembly, schematic, ignore,
                      descriptionFields, notesFields, typeFields,
                      footprintFields, refsToIgnore)
 
+    posData = collectPosData(loadedBoard, correctionFields, bom=components, correctionFile=correctionpatterns)
+    boardReferences = set([x[0] for x in posData])
+    bom = {key: [v for v in val if v in boardReferences] for key, val in bom.items()}
+    bom = {key: val for key, val in bom.items() if len(val) > 0}
+
     missingFields = False
     for type, references in bom.items():
         _, _, manu, partno, _, _ = type
@@ -170,7 +175,6 @@ def exportPcbway(board, outputdir, assembly, schematic, ignore,
     if missingFields and missingerror:
         sys.exit("There are components with missing ordercode, aborting")
 
-    posData = collectPosData(loadedBoard, correctionFields, bom=components, correctionFile=correctionpatterns)
     posDataToFile(posData, os.path.join(outputdir, expandNameTemplate(nametemplate, "pos", loadedBoard) + ".csv"))
     types = collectSolderTypes(loadedBoard)
     bomToCsv(bom, os.path.join(outputdir, expandNameTemplate(nametemplate, "bom", loadedBoard) + ".csv"), nboards, types)
