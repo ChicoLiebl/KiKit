@@ -238,7 +238,11 @@ def exportKameda(board, outputdir, assembly, schematic, ignore,
     gerberImpl(board, gerberdir, settings=exportSettingsPcbway)
 
     archiveName = expandNameTemplate(nametemplate, "gerbers", loadedBoard)
-    shutil.make_archive(os.path.join(outputdir, archiveName), "zip", outputdir, "gerber")
+    shutil.make_archive(
+        base_name=os.path.join(outputdir, archiveName), 
+        format="zip", 
+        root_dir=gerberdir
+    )
 
     if not assembly:
         return
